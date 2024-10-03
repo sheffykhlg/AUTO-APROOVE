@@ -8,5 +8,6 @@ BOT_TOKEN = getenv("BOT_TOKEN") #Put your bot token here
 CHANNEL = getenv("CHANNEL", "ZenBotX") #Your public channel username without @ for force subscription.
 MONGO = getenv("MONGO") #Put mongo db url here
 #Optional Variables
+DELAY = int(getenv("DELAY", 600)) #Delay in secondsbefore join request should be accepted default to 10 minutes
 OWNER_ID = int(getenv("OWNER_ID", 6542673293)) #Go to @ThunderrXbot and type /id and put that value here. 
 FSUB = bool(getenv("FSUB", False)) #Set this True if you want to enable force subscription from users else set to False.

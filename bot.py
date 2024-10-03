@@ -1,11 +1,11 @@
 import os, random, traceback
 import config
-
+import asyncio
 from pyrogram import filters, Client
 from pyrogram.types import Message, ChatJoinRequest, InlineKeyboardButton, InlineKeyboardMarkup 
 from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid, ChatAdminRequired, UserNotParticipant
 
-from database import add_user, add_group, all_users, all_groups, users, remove_user
+from database import add_user, add_group, all_users, all_groups, already_dbg, remove_user, get_all_peers, add_accept_delay, get_adelay
 
 app = Client("Auto Approve Bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token=config.BOT_TOKEN)
 
@@ -16,21 +16,38 @@ welcome=[
     "https://telegra.ph/file/17a8ab5b8eeb0b898d575.mp4",
 ]
 
+def_delay = config.DELAY
+
+async def create_approve_task(app: Client, j: ChatJoinRequest, after_delay: int):
+    await asyncio.sleep(after_delay)
+    chat = j.from_user
+    user = j.chat
+    try:
+        await app.approve_chat_join_request(chat.id, user.id)
+        gif = random.choice(welcome)
+        await app.send_animation(chat_id=user.id, animation=gif, caption=f"Hey There {user.first_name}\nWelcome To {chat.title}\n\n{user.first_name} Your Request To Join {chat.title} Has Been Accepted By {app.me.first_name}")
+    except (UserIsBlocked, PeerIdInvalid):
+        pass
+    except Exception as err:
+        print(str(err))
+    return
+
 #approve 
 @app.on_chat_join_request()
 async def approval(app: Client, m: ChatJoinRequest):
     usr = m.from_user
     cht = m.chat
-    try:
-        add_group(cht.id)
-        await app.approve_chat_join_request(cht.id, usr.id)
-        gif = random.choice(welcome)
-        await app.send_animation(chat_id=usr.id, animation=gif, caption=f"Hey There {usr.first_name}\nWelcome To {cht.title}\n\n{usr.first_name} Your Request To Join {cht.title} Has Been Accepted By {app.me.first_name}")
-        add_user(usr.id)
-    except (UserIsBlocked, PeerIdInvalid):
-        pass
-    except Exception as err:
-        print(str(err))   
+    global def_delay
+    Delay = get_adelay(cht.id)
+    if not Delay:
+        add_accept_delay(cht.id, def_delay)
+        Delay = def_delay
+    add_group(cht.id)
+    add_user(usr.id)
+
+    asyncio.create_task(create_approve_task(app, m, Delay))
+
+    
 
 #pvtstart
 @app.on_message(filters.command("start") & filters.private)
@@ -80,26 +97,22 @@ async def dbtool(app: Client, m: Message):
 #Broadcast
 @app.on_message(filters.command("fbroadcast") & filters.user(config.OWNER_ID))
 async def fcast(_, m : Message):
-    allusers = users
+    allusers = get_all_peers()
     lel = await m.reply_text("`⚡️ Processing...`")
     success = 0
     failed = 0
     deactivated = 0
     blocked = 0
-    for usrs in allusers.find():
+    for user in allusers:
         try:
-            userid = usrs["user_id"]
-            #print(int(userid))
-            if m.command[0] == "fbroadcast":
-                await m.reply_to_message.forward(int(userid))
+            await m.reply_to_message.forward(user)
             success +=1
         except FloodWait as ex:
             await asyncio.sleep(ex.value)
-            if m.command[0] == "fbroadcast":
-                await m.reply_to_message.forward(int(userid))
+            await m.reply_to_message.forward(user)
         except InputUserDeactivated:
             deactivated +=1
-            remove_user(userid)
+            remove_user(user)
         except UserIsBlocked:
             blocked +=1
         except Exception as e:
@@ -108,6 +121,31 @@ async def fcast(_, m : Message):
 
     await lel.edit(f"✅Successful Broadcast to {success} users.\n❌ Failed to {failed} users.\n👾 Found {blocked} Blocked users \n👻 Found {deactivated} Deactivated users.")
     
+@app.on_message(filters.command("delay") & filters.user(config.OWNER_ID))
+async def add_delay_before_accepting(_, m: Message):
+    splited = m.command
+    if len(m.command) != 3:
+        await m.reply_text("**USAGE**\n/delay [chat id] [delay in seconds]")
+        return
+    
+    try:
+        chat_id = int(splited[1])
+        delay = int(splited[2])
+    except:
+        await m.reply_text("Chat id and delay should be integer")
+        return
+    
+    if not already_dbg(chat_id):
+        await m.reply_text("This chat id doesn't exist in my database")
+        return
+    
+    timee = add_accept_delay(chat_id, delay)
+    if timee:
+        await m.reply_text(f"Updated delay from {timee} seconds to {delay} seconds")
+        return
+    
+    await m.reply_text(f"Added delay of {delay} seconds before accepting join request")
+    return
 
 
 #run
