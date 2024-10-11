@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+
 from config import MONGO
 
 client = MongoClient(MONGO)
@@ -61,7 +62,7 @@ def add_accept_delay(chat: int, time: int):
         delay.update_one({"chat_id": chat}, {"delay": time})
         return already["delay"]
     else:
-        delay.insert_one({"chat_id": delay, "delay": time})
+        delay.insert_one({"chat_id": chat, "delay": time})
         return time
 
 def get_adelay(chat: int):

@@ -1,11 +1,18 @@
-import os, random, traceback
-import config
 import asyncio
-from pyrogram import filters, Client
-from pyrogram.types import Message, ChatJoinRequest, InlineKeyboardButton, InlineKeyboardMarkup 
-from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, PeerIdInvalid, ChatAdminRequired, UserNotParticipant
+import random
+import traceback
 
-from database import add_user, add_group, all_users, all_groups, already_dbg, remove_user, get_all_peers, add_accept_delay, get_adelay
+from pyrogram import Client, filters
+from pyrogram.errors import (ChatAdminRequired, FloodWait,
+                             InputUserDeactivated, PeerIdInvalid,
+                             UserIsBlocked, UserNotParticipant)
+from pyrogram.types import (ChatJoinRequest, InlineKeyboardButton,
+                            InlineKeyboardMarkup, Message)
+
+import config
+from database import (add_accept_delay, add_group, add_user, all_groups,
+                      all_users, already_dbg, get_adelay, get_all_peers,
+                      remove_user)
 
 app = Client("Auto Approve Bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token=config.BOT_TOKEN)
 
@@ -20,17 +27,17 @@ def_delay = config.DELAY
 
 async def create_approve_task(app: Client, j: ChatJoinRequest, after_delay: int):
     await asyncio.sleep(after_delay)
-    chat = j.from_user
-    user = j.chat
+    chat = j.chat
+    user = j.from_user
     try:
         await app.approve_chat_join_request(chat.id, user.id)
         gif = random.choice(welcome)
         await app.send_animation(chat_id=user.id, animation=gif, caption=f"Hey There {user.first_name}\nWelcome To {chat.title}\n\n{user.first_name} Your Request To Join {chat.title} Has Been Accepted By {app.me.first_name}")
     except (UserIsBlocked, PeerIdInvalid):
         pass
-    except Exception as err:
-        print(str(err))
+
     return
+
 
 #approve 
 @app.on_chat_join_request()
