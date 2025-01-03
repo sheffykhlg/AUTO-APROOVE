@@ -105,20 +105,39 @@ async def dbtool(app: Client, m: Message):
 
 #Broadcast
 @app.on_message(filters.command("fbroadcast") & filters.user(config.OWNER_ID))
-async def fcast(_, m : Message):
+async def fcast(c: Client, m : Message):
     allusers = get_all_peers()
     lel = await m.reply_text("`⚡️ Processing...`")
     success = 0
     failed = 0
     deactivated = 0
+    repl_to = m.reply_to_message
     blocked = 0
+    if not repl_to:
+        await lel.edit_text("Please reply to a message")
+        return
+    _id = repl_to.id
+    chat_id = m.chat.id
     for user in allusers:
         try:
-            await m.reply_to_message.forward(user)
-            success +=1
+            if m.media_group_id:
+                await c.forward_media_group(user, chat_id, _id, hide_sender_name=True)
+                success += 1
+            else:
+                await repl_to.forward(user)
+                success +=1
         except FloodWait as ex:
             await asyncio.sleep(ex.value)
-            await m.reply_to_message.forward(user)
+            try:
+                if m.media_group_id:
+                    await c.forward_media_group(user, chat_id, _id)
+                    success += 1
+                else:
+                    await repl_to.forward(user, hide_sender_name=True)
+                    success +=1
+            except Exception as e:
+                print(f"Error while broadcast {e}")
+                continue
         except InputUserDeactivated:
             deactivated +=1
             remove_user(user)
