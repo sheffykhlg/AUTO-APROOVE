@@ -12,3 +12,4 @@ MONGO = getenv("MONGO") #Put mongo db url here
 DELAY = int(getenv("DELAY", 5)) #Delay in secondsbefore join request should be accepted default to 5 seconds
 OWNER_ID = int(getenv("OWNER_ID", 1344569458)) 
 FSUB = bool(getenv("FSUB", False)) #Set this True if you want to enable force subscription from users else set to False.
+CHANNEL_ID = int(getenv("Channel_ID")) #Id of channel from where you want to automatically broadcast messages

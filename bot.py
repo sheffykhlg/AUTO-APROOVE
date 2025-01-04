@@ -6,8 +6,9 @@ from pyrogram import Client, filters
 from pyrogram.errors import (ChatAdminRequired, FloodWait,
                              InputUserDeactivated, PeerIdInvalid,
                              UserIsBlocked, UserNotParticipant)
-from pyrogram.types import (ChatJoinRequest, InlineKeyboardButton,
-                            InlineKeyboardMarkup, Message)
+from pyrogram.types import (CallbackQuery, ChatJoinRequest,
+                            InlineKeyboardButton, InlineKeyboardMarkup,
+                            Message)
 
 import config
 from database import (add_accept_delay, add_group, add_user, all_groups,
@@ -103,37 +104,30 @@ async def dbtool(app: Client, m: Message):
     x = all_groups()
     await m.reply_text(text=f"Stats for {app.me.mention}\n🙋‍♂️ Users : {xx}\n👥 Groups : {x}")
 
-#Broadcast
-@app.on_message(filters.command("fbroadcast") & filters.user(config.OWNER_ID))
-async def fcast(c: Client, m : Message):
+
+#Boradcast creator
+async def broadcaster(c: Client, chat_id: int, _id: int, media_grp=False):
     allusers = get_all_peers()
-    lel = await m.reply_text("`⚡️ Processing...`")
     success = 0
     failed = 0
     deactivated = 0
-    repl_to = m.reply_to_message
     blocked = 0
-    if not repl_to:
-        await lel.edit_text("Please reply to a message")
-        return
-    _id = repl_to.id
-    chat_id = m.chat.id
     for user in allusers:
         try:
-            if m.media_group_id:
+            if media_grp:
                 await c.forward_media_group(user, chat_id, _id, hide_sender_name=True)
                 success += 1
             else:
-                await repl_to.forward(user)
+                await c.forward_messages(user, chat_id, _id, hide_sender_name=True)
                 success +=1
         except FloodWait as ex:
             await asyncio.sleep(ex.value)
             try:
-                if m.media_group_id:
-                    await c.forward_media_group(user, chat_id, _id)
+                if media_grp:
+                    await c.forward_media_group(user, chat_id, _id, hide_sender_name=True)
                     success += 1
                 else:
-                    await repl_to.forward(user, hide_sender_name=True)
+                    await c.forward_messages(user, chat_id, _id, hide_sender_name=True)
                     success +=1
             except Exception as e:
                 print(f"Error while broadcast {e}")
@@ -146,6 +140,29 @@ async def fcast(c: Client, m : Message):
         except Exception as e:
             print(e)
             failed +=1
+
+    return success, failed, deactivated, blocked
+
+
+#Broadcast
+@app.on_message(filters.command("fbroadcast") & filters.user(config.OWNER_ID))
+async def fcast(c: Client, m : Message):
+    lel = await m.reply_text("`⚡️ Processing...`")
+    success = 0
+    failed = 0
+    deactivated = 0
+    repl_to = m.reply_to_message
+    blocked = 0
+    if not repl_to:
+        await lel.edit_text("Please reply to a message")
+        return
+    _id = repl_to.id
+    chat_id = m.chat.id
+    is_grp = False
+    if repl_to.media_group_id:
+        is_grp = True
+    
+    success, failed, deactivated, blocked = await broadcaster(c, chat_id, _id, is_grp)
 
     await lel.edit(f"✅Successful Broadcast to {success} users.\n❌ Failed to {failed} users.\n👾 Found {blocked} Blocked users \n👻 Found {deactivated} Deactivated users.")
     
@@ -174,6 +191,59 @@ async def add_delay_before_accepting(_, m: Message):
     
     await m.reply_text(f"Added delay of {delay} seconds before accepting join request")
     return
+
+
+media_grps = []
+
+async def removee(grp_id):
+    await asyncio.sleep(300)
+    try:
+        media_grps.remove(grp_id)
+    except:
+        pass
+
+    return
+
+
+@app.on_messag(filters.chat(config.CHANNEL_ID))
+async def listen_and_broadcast(c: Client, m: Message):
+    if m.media_group_id:
+        if m.media_group_id in media_grps:
+            return
+        else:
+            txt = f"grp:{m.id}"
+            media_grps.append(m.media_group_id)
+            asyncio.create_task(removee(m.media_group_id))
+
+    else:
+        txt = f"sol:{m.id}"
+    
+    kb = [
+        [
+            InlineKeyboardButton("Yes, broadcast", txt)
+        ],
+        [
+            InlineKeyboardButton("No, don't broadcast", "delete")
+        ]
+    ]
+
+    await c.send_message(config.OWNER_ID, "Hi there do you want to broadcast this message?", reply_markup=InlineKeyboardMarkup(kb), reply_to_chat_id=m.chat.id, reply_to_message_id=m.id)
+
+@app.on_callback_query()
+async def callbackss(c: Client, q: CallbackQuery):
+    if q.data == "delete":
+        await q.edit_message_text("Okay will not broadcast this message")
+        return
+
+    else:
+        is_grp, id_ = q.data.split(":")
+        is_grp = False if is_grp == "sol" else True
+        
+    success, failed, deactivated, blocked = await broadcaster(c, config.CHANNEL_ID, id_, is_grp)
+    to_edit = await q.edit_message_text("Broadcasting this message")
+    await to_edit.edit_text(f"✅Successful Broadcast to {success} users.\n❌ Failed to {failed} users.\n👾 Found {blocked} Blocked users \n👻 Found {deactivated} Deactivated users.")
+    return
+    
 
 
 #run
