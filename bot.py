@@ -55,7 +55,7 @@ async def start(app: Client, msg: Message):
                         InlineKeyboardButton(f"➡️ ᴀᴅᴅ {app.me.first_name} ✅", url=f"https://t.me/{app.me.username}?startgroup=true")
                     ],
                     [
-                        InlineKeyboardButton("✅ ᴄʜᴀɴɴᴇʟ {(await app.get_chat(config.CHANNEL)).title} ▶", url=f"https://t.me/{config.CHANNEL}")
+                        InlineKeyboardButton(f"✅{(await app.get_chat(config.CHANNEL)).title}▶", url=f"https://t.me/{config.CHANNEL}")
                     ],
                 ]
             )
