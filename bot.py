@@ -39,8 +39,8 @@ async def start(app: Client, msg: Message):
         try:
             await app.get_chat_member(chat_id=config.CHANNEL, user_id=msg.from_user.id)
             add_user(msg.from_user.id)
-            await msg.reply_photo(photo="https://telegra.ph/file/f394c45e5f2f147a37090.jpg", caption=f"Hᴇʟʟᴏ {msg.from_user.mention}💞,\n\n☉︎ Tʜɪs ɪs {app.me.mention},\n\n➲ A ᴛᴇʟᴇɢʀᴀᴍ ʙᴏᴛ ᴍᴀᴅᴇ ғᴏʀ ᴀᴜᴛᴏ ᴀᴘᴘʀᴏᴠɪɴɢ ᴊᴏɪɴ ʀᴇǫᴜᴇsᴛ ɪɴ ɢʀᴏᴜᴘ/ᴄʜᴀɴɴᴇʟ.\n\n➲ Jᴜsᴛ ᴀᴅᴅ {app.me.mention} ɪɴ ɢʀᴏᴜᴘs/ᴄʜᴀɴɴᴇʟs ᴀɴᴅ ᴍᴀᴋᴇ ᴀᴅᴍɪɴ ᴡɪᴛʜ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ʀɪɢʜᴛs..",
-                                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"ᴀᴅᴅ {app.me.first_name}", url=f"https://t.me/{app.me.username}?startgroup=true")], [InlineKeyboardButton("ᴄʜᴀɴɴᴇʟ", url=f"https://t.me/{config.CHANNEL}")]]))
+            await msg.reply_photo(photo="ʜᴇʏ ☺️{msg.from_user.mention}💞👋 ʜᴏᴡ ᴀʀᴇ ʏᴏᴜ,\n\n☉︎ Tʜɪs ɪs {app.me.mention},\n\n➲ A ᴛᴇʟᴇɢʀᴀᴍ ʙᴏᴛ ᴍᴀᴅᴇ ғᴏʀ ᴀᴜᴛᴏ ᴀᴘᴘʀᴏᴠɪɴɢ ᴊᴏɪɴ ʀᴇǫᴜᴇsᴛ ɪɴ ɢʀᴏᴜᴘ/ᴄʜᴀɴɴᴇʟ.\n\n➲ Jᴜsᴛ ᴀᴅᴅ {app.me.mention} ɪɴ ɢʀᴏᴜᴘs/ᴄʜᴀɴɴᴇʟs ᴀɴᴅ ᴍᴀᴋᴇ ᴀᴅᴍɪɴ ᴡɪᴛʜ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ʀɪɢʜᴛs.\n\n➲ᴀғᴛᴇʀ ᴜ ᴄᴀɴ ᴄʜᴇᴄᴋ ᴍʏ ᴘᴏᴡᴇʀ",
+                                 reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(f"➡️ ᴀᴅᴅ {app.me.first_name} ✅", url=f"https://t.me/{app.me.username}?startgroup=true")], [InlineKeyboardButton("✅ ᴄʜᴀɴɴᴇʟ {(await app.get_chat(config.CHANNEL)).title} ▶", url=f"https://t.me/{config.CHANNEL}")]]))
         except UserNotParticipant:
             await msg.reply_text(text=f"ʜᴇʏ ☺️{msg.from_user.mention}💞👋,\nʜᴏᴡ ᴀʀᴇ ʏᴏᴜ\n\nɪғ ᴜ ᴡᴀɴᴛ ᴛᴏ ᴜsᴇ ᴛʜɪs {app.me.mention}, ʙᴏᴛ ᴛʜᴇɴ ᴘʟᴇᴀsᴇ sᴜʙsᴄʀɪʙᴇ ᴍʏ ᴄʜᴀɴɴᴇʟ\n\nᴄʟɪᴄᴋ ᴛᴏ ᴊᴏɪɴᴛ ʙᴜᴛᴛᴏɴ ᴀғᴛᴇʀ ᴊᴏɪɴ ᴜ ᴄᴀɴ ᴛᴀᴘ ᴏɴ ᴊᴏɪɴᴇᴅ ʙᴜᴛᴛᴏɴ\n\nᴛʜᴀɴx ғᴏʀ ᴜsɪɴɢ ᴍᴇ ᴀɴᴅ ᴛʜᴀɴx ғᴏʀ ᴊᴏɪɴɪɴɢ ᴍʏ {(await app.get_chat(config.CHANNEL)).title} ᴄʜᴀɴɴᴇʟ", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🤝 ᴊᴏɪɴ 🤝", url=f"https://t.me/{config.CHANNEL}")], [InlineKeyboardButton ("🧑🏻‍🤝‍🧑🏿 ᴊᴏɪɴᴇᴅ ✅", url=f"https://t.me/{app.me.username}?start=start")]]))
         except ChatAdminRequired:
@@ -55,7 +55,7 @@ async def start(app: Client, msg: Message):
                         InlineKeyboardButton(f"➡️ ᴀᴅᴅ {app.me.first_name} ✅", url=f"https://t.me/{app.me.username}?startgroup=true")
                     ],
                     [
-                        InlineKeyboardButton("✅ ᴄʜᴀɴɴᴇʟ ▶", url=f"https://t.me/moviescrownvip1")
+                        InlineKeyboardButton("✅ ᴄʜᴀɴɴᴇʟ {(await app.get_chat(config.CHANNEL)).title} ▶", url=f"https://t.me/{config.CHANNEL}")
                     ],
                 ]
             )
