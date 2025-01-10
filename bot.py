@@ -142,7 +142,10 @@ async def approve(client, message):
 
     msg = await client.send_message(Id, "**Task Completed** ✓ **Approved Pending All Join Request**")
     await msg.delete()
-    
+
+
+logging.info("Bot Started....")
+User.run()    
 
 
 #run
