@@ -144,10 +144,6 @@ async def approve(client, message):
     await msg.delete()
 
 
-logging.info("Bot Started....")
-User.run()    
-
-
 #run
 print(f"Starting {app.name}")
 try:
