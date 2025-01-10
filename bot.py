@@ -11,7 +11,7 @@ from pyrogram.errors import FloodWait, InputUserDeactivated, UserIsBlocked, Peer
 from database import add_user, add_group, all_users, all_groups, users, remove_user
 
 logging.basicConfig(level=logging.ERROR)
-User = Client(name="AcceptUser", session_string=SESSION)
+User = Client(name="AcceptUser", session_string=config.SESSION)
 
 app = Client("Auto Approve Bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token=config.BOT_TOKEN)
 
