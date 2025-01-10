@@ -47,7 +47,7 @@ async def start(app: Client, msg: Message):
             await app.send_message(text=f"ɪ'ᴍ ɴᴏᴛ ᴀᴅᴍɪɴ ɪɴ ғsᴜʙ ᴄʜᴀᴛ, ᴇɴᴅɪɴɢ ғsᴜʙ...", chat_id=config.OWNER_ID)
     else:
         await msg.reply_photo(
-            photo="https://telegra.ph/file/f394c45e5f2f147a37090.jpg",
+            photo=random.choice(PICS),
             caption=f"ʜᴇʏ ☺️{msg.from_user.mention}💞👋 ʜᴏᴡ ᴀʀᴇ ʏᴏᴜ,\n\n☉︎ Tʜɪs ɪs {app.me.mention},\n\n➲ A ᴛᴇʟᴇɢʀᴀᴍ ʙᴏᴛ ᴍᴀᴅᴇ ғᴏʀ ᴀᴜᴛᴏ ᴀᴘᴘʀᴏᴠɪɴɢ ᴊᴏɪɴ ʀᴇǫᴜᴇsᴛ ɪɴ ɢʀᴏᴜᴘ/ᴄʜᴀɴɴᴇʟ.\n\n➲ Jᴜsᴛ ᴀᴅᴅ {app.me.mention} ɪɴ ɢʀᴏᴜᴘs/ᴄʜᴀɴɴᴇʟs ᴀɴᴅ ᴍᴀᴋᴇ ᴀᴅᴍɪɴ ᴡɪᴛʜ ɪɴᴠɪᴛᴇ ᴜsᴇʀs ᴠɪᴀ ʟɪɴᴋ ʀɪɢʜᴛs.\n\n➲ᴀғᴛᴇʀ ᴜ ᴄᴀɴ ᴄʜᴇᴄᴋ ᴍʏ ᴘᴏᴡᴇʀ",
             reply_markup=InlineKeyboardMarkup(
                 [
