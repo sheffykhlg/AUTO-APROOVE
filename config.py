@@ -10,3 +10,4 @@ MONGO = getenv("MONGO", "mongodb+srv://mongodb7575:mkCNT8b2LZJX5ekf@cluster0.bcu
 #Optional Variables
 OWNER_ID = int(getenv("OWNER_ID", 6514361814)) #Go to @ThunderrXbot and type /id and put that value here. 
 FSUB = bool(getenv("FSUB", True)) #Set this True if you want to enable force subscription from users else set to False.
+PICS = getenv('PICS', 'https://i.ibb.co/JHd49Yb/file-629.jpg').split()
